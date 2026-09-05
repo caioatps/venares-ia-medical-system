@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>{{ nomes.base }}</title>
+<style>
+  @page {
+    size: A4;
+    margin: 22mm 18mm 20mm 18mm;
+    @bottom-center {
+      content: "{{ rodape }}";
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 7.5pt;
+      color: #8a8a8a;
+    }
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+      font-family: "DejaVu Sans", Arial, sans-serif;
+      font-size: 7.5pt;
+      color: #8a8a8a;
+    }
+  }
+  @page :first { @bottom-center { content: ""; } @bottom-right { content: ""; } }
+
+  :root { --primaria: {{ cor_primaria }}; --secundaria: {{ cor_secundaria }}; }
+
+  * { box-sizing: border-box; }
+  body {
+    font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: #23282b;
+    margin: 0;
+  }
+
+  /* ---------------- capa ---------------- */
+  .capa { page-break-after: always; padding-top: 18mm; }
+  .capa .logo { max-height: 26mm; margin-bottom: 12mm; }
+  .capa .selo {
+    display: inline-block;
+    background: {{ cor_primaria }};
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 9pt;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .capa h1 {
+    font-size: 26pt;
+    line-height: 1.2;
+    margin: 10mm 0 4mm;
+    color: {{ cor_primaria }};
+  }
+  .capa .subtitulo { font-size: 13pt; color: #5c6469; margin-bottom: 14mm; }
+  .capa .ficha { border-top: 2px solid {{ cor_secundaria }}; padding-top: 6mm; }
+  .capa .ficha dl { display: block; margin: 0; }
+  .capa .ficha dt {
+    font-size: 8pt; text-transform: uppercase; letter-spacing: .08em;
+    color: #8a9094; margin-top: 4mm;
+  }
+  .capa .ficha dd { margin: 1mm 0 0; font-size: 11pt; }
+  .aviso {
+    margin-top: 16mm; padding: 4mm 5mm;
+    border-left: 3px solid {{ cor_secundaria }};
+    background: #faf7f3; font-size: 8.5pt; color: #6b6257;
+  }
+
+  /* ---------------- corpo ---------------- */
+  h2 {
+    font-size: 13pt;
+    color: {{ cor_primaria }};
+    border-bottom: 1.5px solid #e3e7e9;
+    padding-bottom: 2mm;
+    margin: 9mm 0 4mm;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 11pt;
+    margin: 6mm 0 2mm;
+    color: #1d2528;
+    page-break-after: avoid;
+  }
+  p { margin: 0 0 3mm; text-align: justify; }
+  ul { margin: 0 0 4mm; padding-left: 5mm; }
+  li { margin-bottom: 1.6mm; }
+
+  .resumo-executivo {
+    background: #f4f8f9;
+    border-left: 3px solid {{ cor_primaria }};
+    padding: 4mm 5mm;
+    margin-bottom: 4mm;
+  }
+  .resumo-executivo p { margin: 0; }
+
+  .tempo {
+    display: inline-block;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #fff;
+    background: {{ cor_secundaria }};
+    border-radius: 2px;
+    padding: 1px 5px;
+    margin-right: 2mm;
+    vertical-align: 2px;
+  }
+
+  .destaque { background: #fbf6ec; border: 1px solid #eadfc8; padding: 4mm 5mm; }
+  .destaque ul { margin-bottom: 0; }
+
+  table.glossario { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.glossario th {
+    text-align: left; background: {{ cor_primaria }}; color: #fff;
+    padding: 2mm 3mm; font-size: 9pt;
+  }
+  table.glossario td { padding: 2mm 3mm; border-bottom: 1px solid #e6eaec; vertical-align: top; }
+  table.glossario td.termo { font-weight: bold; width: 32%; color: {{ cor_primaria }}; }
+
+  .caso { border: 1px solid #e3e7e9; border-radius: 3px; padding: 4mm; margin-bottom: 4mm; }
+  .caso h3 { margin-top: 0; }
+  .caso .conduta { border-top: 1px dashed #d6dcdf; padding-top: 2mm; margin-top: 2mm; }
+  .caso .conduta strong { color: {{ cor_primaria }}; }
+
+  .qa { margin-bottom: 4mm; }
+  .qa .pergunta { font-weight: bold; color: {{ cor_primaria }}; margin-bottom: 1mm; }
+
+  .nota-rodape { margin-top: 10mm; font-size: 8pt; color: #8a9094; border-top: 1px solid #e6eaec; padding-top: 3mm; }
+  .evitar-quebra { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<section class="capa">
+  {% if logo_uri %}<img class="logo" src="{{ logo_uri }}" alt="">{% endif %}
+  <span class="selo">{{ mentoria }}</span>
+  <h1>{{ resumo.titulo }}</h1>
+  <div class="subtitulo">Aula {{ "%02d"|format(numero) }} &middot; {{ data_extenso }}</div>
+
+  <div class="ficha">
+    <dl>
+      <dt>Mentoria</dt><dd>{{ mentoria }}</dd>
+      <dt>Numero da aula</dt><dd>{{ "%02d"|format(numero) }}</dd>
+      <dt>Data</dt><dd>{{ data_extenso }}</dd>
+      <dt>Duracao</dt><dd>{{ duracao_texto }}</dd>
+      {% if professores %}<dt>Professor(es)</dt><dd>{{ professores|join(", ") }}</dd>{% endif %}
+      <dt>Titulo da gravacao</dt><dd>{{ titulo_zoom }}</dd>
+    </dl>
+  </div>
+
+  <div class="aviso">
+    Material produzido automaticamente a partir da transcricao da aula gravada e
+    revisado pelo glossario da equipe. Em caso de divergencia, a gravacao original
+    prevalece. {{ rodape }}
+  </div>
+</section>
+
+{% if resumo.resumo_executivo %}
+<h2>Resumo da aula</h2>
+<div class="resumo-executivo"><p>{{ resumo.resumo_executivo }}</p></div>
+{% endif %}
+
+{% if resumo.objetivos %}
+<h2>Objetivos de aprendizagem</h2>
+<ul>{% for item in resumo.objetivos %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% if resumo.topicos %}
+<h2>Conteudo abordado</h2>
+{% for topico in resumo.topicos %}
+<div class="evitar-quebra">
+  <h3>{% if topico.timestamp %}<span class="tempo">{{ topico.timestamp }}</span>{% endif %}{{ topico.titulo }}</h3>
+  {% if topico.pontos %}<ul>{% for ponto in topico.pontos %}<li>{{ ponto }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if resumo.pontos_chave %}
+<h2>Pontos-chave</h2>
+<div class="destaque">
+  <ul>{% for item in resumo.pontos_chave %}<li>{{ item }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if resumo.condutas_praticas %}
+<h2>Condutas e protocolos citados</h2>
+<ul>{% for item in resumo.condutas_praticas %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% if resumo.casos_discutidos %}
+<h2>Casos discutidos</h2>
+{% for caso in resumo.casos_discutidos %}
+<div class="caso evitar-quebra">
+  <h3>{{ caso.titulo }}</h3>
+  <p>{{ caso.descricao }}</p>
+  {% if caso.conduta %}<div class="conduta"><strong>Conduta:</strong> {{ caso.conduta }}</div>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if resumo.perguntas_respostas %}
+<h2>Perguntas dos alunos</h2>
+{% for qa in resumo.perguntas_respostas %}
+<div class="qa evitar-quebra">
+  <div class="pergunta">{{ qa.pergunta }}</div>
+  <div>{{ qa.resposta }}</div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if glossario_final %}
+<h2>Glossario</h2>
+<table class="glossario">
+  <thead><tr><th>Termo</th><th>Definicao</th></tr></thead>
+  <tbody>
+  {% for termo, definicao in glossario_final %}
+    <tr><td class="termo">{{ termo }}</td><td>{{ definicao }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if resumo.referencias %}
+<h2>Referencias citadas na aula</h2>
+<ul>{% for item in resumo.referencias %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% if resumo.proximos_passos %}
+<h2>Proximos passos</h2>
+<ul>{% for item in resumo.proximos_passos %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+
+<div class="nota-rodape">
+  Gerado em {{ gerado_em }} a partir da transcricao automatica do Zoom
+  ({{ palavras }} palavras transcritas).
+</div>
+
+</body>
+</html>

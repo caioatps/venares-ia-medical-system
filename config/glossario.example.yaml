@@ -1,0 +1,91 @@
+# =====================================================================
+# Glossario e filtro de termos medicos
+# Copie para config/glossario.yaml e va alimentando com o tempo.
+#
+# Ele e usado em DOIS momentos:
+#  1) Correcao automatica da transcricao (busca e troca, antes do resumo)
+#  2) Contexto entregue ao Claude, para ele nao "traduzir" nem
+#     descaracterizar os termos que voces usam no dia a dia
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# TERMOS: a forma correta e as variacoes que o Zoom costuma transcrever
+# errado. A troca respeita limites de palavra e ignora acentos/caixa.
+# ---------------------------------------------------------------------
+termos:
+  - correto: "GnRH"
+    variacoes: ["genarra ache", "g n r h", "generre agá", "gnrh"]
+    definicao: "Hormonio liberador de gonadotrofina."
+
+  - correto: "hCG"
+    variacoes: ["hcg", "agá cê gê", "h c g"]
+    definicao: "Gonadotrofina corionica humana."
+
+  - correto: "SHBG"
+    variacoes: ["shbg", "esse agá bê gê"]
+    definicao: "Globulina ligadora de hormonios sexuais."
+
+  - correto: "TRH"
+    variacoes: ["te erre agá", "t r h"]
+    definicao: "Terapia de reposicao hormonal."
+
+  - correto: "estradiol"
+    variacoes: ["estradiol", "extradiol", "estra diol"]
+    definicao: "Principal estrogenio circulante."
+
+  - correto: "testosterona"
+    variacoes: ["testosterona", "testoterona", "testosteronas"]
+
+  - correto: "undecanoato"
+    variacoes: ["undecanoato", "andecanoato", "undecanato"]
+
+  - correto: "anastrozol"
+    variacoes: ["anastrozol", "anastrazol", "ana strozol"]
+
+  - correto: "implante hormonal"
+    variacoes: ["implante hormonal", "chip da beleza"]
+
+# ---------------------------------------------------------------------
+# ABREVIACOES: expandidas apenas na secao de glossario do PDF.
+# O texto do resumo mantem a sigla.
+# ---------------------------------------------------------------------
+abreviacoes:
+  TRH: "Terapia de Reposicao Hormonal"
+  SOP: "Sindrome dos Ovarios Policisticos"
+  IMC: "Indice de Massa Corporal"
+  TSH: "Hormonio Tireoestimulante"
+  DHEA: "Deidroepiandrosterona"
+
+# ---------------------------------------------------------------------
+# SUBSTITUICOES POR EXPRESSAO REGULAR
+# Para padroes que nao cabem na lista de termos (unidades, numeros...).
+# ---------------------------------------------------------------------
+substituicoes_regex:
+  - de: "(?i)\\bmicro\\s*gramas?\\b"
+    para: "mcg"
+  - de: "(?i)\\bmiligramas?\\b"
+    para: "mg"
+  - de: "(?i)\\bmililitros?\\b"
+    para: "mL"
+  - de: "(?i)\\bnanogramas?\\s+por\\s+decilitro\\b"
+    para: "ng/dL"
+
+# ---------------------------------------------------------------------
+# LIMPEZA: linhas/frases descartadas da transcricao (ruido de gravacao).
+# Comparacao por substring, sem acentos e sem caixa.
+# ---------------------------------------------------------------------
+remover_frases:
+  - "esta reuniao esta sendo gravada"
+  - "gravacao iniciada"
+  - "gravacao interrompida"
+  - "you"
+  - "obrigado por assistir"
+
+# ---------------------------------------------------------------------
+# PARTICIPANTES: mapeia o nome do Zoom para o nome de exibicao no PDF.
+# Use tambem para marcar quem e o professor.
+# ---------------------------------------------------------------------
+participantes:
+  - zoom: "Dr. Fulano"
+    exibir: "Dr. Fulano de Tal"
+    papel: professor

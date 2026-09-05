@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Segredos e configuração local
+.env
+config/config.yaml
+config/glossario.yaml
+credenciais/
+*.json.local
+token_google.json
+service_account.json
+
+# Dados em execução
+dados/
+trabalho/
+*.db
+*.sqlite3
+*.log

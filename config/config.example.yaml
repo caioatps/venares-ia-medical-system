@@ -1,0 +1,120 @@
+# =====================================================================
+# Configuracao principal - copie para config/config.yaml e ajuste.
+# =====================================================================
+
+fuso_horario: America/Sao_Paulo
+idioma: pt-BR
+
+# ---------------------------------------------------------------------
+# MENTORIAS
+# O agente le o titulo da reuniao no Zoom e decide para qual mentoria
+# a aula pertence, comparando com as palavras-chave abaixo (sem
+# diferenciar maiusculas/minusculas nem acentos).
+# A primeira mentoria cujas palavras-chave aparecerem no titulo vence;
+# em caso de empate, vence a que tiver a palavra-chave mais longa.
+# ---------------------------------------------------------------------
+mentorias:
+  - id: start
+    nome: "Mentoria Start"
+    palavras_chave: ["start", "mentoria start", "starter"]
+    # ID da pasta no Google Drive (o trecho depois de /folders/ na URL)
+    pasta_drive_id: "COLE_AQUI_O_ID_DA_PASTA_START"
+    # Preencha se a pasta estiver dentro de um Drive Compartilhado
+    drive_compartilhado_id: null
+
+  - id: surgical
+    nome: "Mentoria Surgical"
+    palavras_chave: ["surgical", "cirurgica", "cirurgico", "sandico"]
+    pasta_drive_id: "COLE_AQUI_O_ID_DA_PASTA_SURGICAL"
+    drive_compartilhado_id: null
+
+# O que fazer quando o titulo nao casa com nenhuma mentoria:
+#   null  -> nao envia nada e avisa voce no WhatsApp para decidir
+#   "start" / "surgical" -> usa essa mentoria como padrao
+mentoria_padrao: null
+
+# ---------------------------------------------------------------------
+# NOMEACAO E NUMERACAO SEQUENCIAL
+# ---------------------------------------------------------------------
+nomeacao:
+  # Campos disponiveis: {numero}, {data}, {mentoria}, {titulo_zoom}
+  padrao: "Aula {numero:02d} - {data} - {mentoria}"
+  formato_data: "%d-%m-%Y"
+  # Como o numero da aula e lido nos arquivos que ja estao na pasta.
+  # O grupo 1 da expressao precisa ser o numero.
+  regex_numero: "(?i)aula\\s*n?[.º]?\\s*0*(\\d{1,3})"
+  numero_inicial: 1
+  # Cria uma subpasta por aula ("Aula 04 - ...") em vez de jogar os dois
+  # arquivos soltos na pasta da mentoria.
+  criar_subpasta_por_aula: false
+  sufixo_video: ""            # ex.: " - Aula gravada"
+  sufixo_resumo: " - Resumo"
+
+# ---------------------------------------------------------------------
+# ZOOM
+# ---------------------------------------------------------------------
+zoom:
+  # Quanto tempo, no maximo, esperar a transcricao ficar pronta na nuvem
+  # antes de desistir e avisar.
+  espera_maxima_transcricao_min: 90
+  # Intervalo entre novas checagens enquanto a transcricao nao aparece.
+  intervalo_nova_tentativa_min: 5
+  # Ignora gravacoes cujo titulo case com algum destes padroes.
+  ignorar_titulos: ["teste", "reuniao interna"]
+  # Duracao minima (min) para considerar que foi mesmo uma aula.
+  duracao_minima_min: 15
+  # Apaga a gravacao da nuvem do Zoom depois de subir para o Drive.
+  # Deixe false ate confiar 100% no fluxo.
+  apagar_da_nuvem_apos_upload: false
+
+# ---------------------------------------------------------------------
+# RESUMO (Claude)
+# ---------------------------------------------------------------------
+resumo:
+  modelo: "claude-opus-5"
+  effort: "high"
+  max_tokens: 16000
+  # Timeout (s) de cada chamada ao modelo - aula longa demora.
+  timeout_s: 1800
+  # Acima deste tamanho de transcricao, o texto e resumido em blocos e
+  # depois consolidado (map-reduce). Abaixo, vai em uma unica chamada.
+  limite_caracteres_chamada_unica: 500000
+  caracteres_por_bloco: 120000
+  # Instrucoes livres suas, injetadas no prompt (tom, o que enfatizar).
+  instrucoes_extras: |
+    Escreva para medicos em formacao na mentoria. Priorize conduta
+    pratica, criterios de decisao, doses e protocolos citados.
+    Nao invente nada que nao esteja na transcricao.
+
+# ---------------------------------------------------------------------
+# PDF
+# ---------------------------------------------------------------------
+pdf:
+  template: "templates/resumo_aula.html"
+  # Caminho para uma imagem PNG/JPG usada como logotipo na capa.
+  logo: null
+  cor_primaria: "#0F4C5C"
+  cor_secundaria: "#9A6A3A"
+  rodape: "Material de uso exclusivo dos alunos da mentoria. Proibida a redistribuicao."
+
+# ---------------------------------------------------------------------
+# NOTIFICACAO - WhatsApp
+# ---------------------------------------------------------------------
+notificacao:
+  whatsapp:
+    ativo: true
+    provedor: "meta"        # "meta" (WhatsApp Cloud API) ou "twilio"
+    destinatarios:
+      - "+5500000000000"    # responsavel de TI
+    # Para o provedor "meta": fora da janela de 24h so passa mensagem de
+    # template aprovado. Deixe "nome_template" preenchido para usa-lo.
+    # As variaveis {{1}}..{{5}} recebem, nesta ordem:
+    # mentoria, numero da aula, data, link do video, link do resumo.
+    nome_template: "aula_publicada"
+    idioma_template: "pt_BR"
+    # Se nao houver template aprovado, mande texto livre (so funciona
+    # dentro da janela de 24h de conversa).
+    usar_texto_livre_se_sem_template: false
+  # Tambem avisa voce quando algo der errado.
+  avisar_erros_para:
+    - "+5500000000000"
